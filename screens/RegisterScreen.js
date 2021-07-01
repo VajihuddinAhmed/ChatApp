@@ -47,6 +47,7 @@ const RegisterScreen = () => {
                 leftIcon={{ type: 'material', name: 'email'}} 
                 value={email} 
                 onChangeText={text => setEmail(text)} 
+                autoCapitalize="none"
             />
             <Input 
                 placeholder="Enter your Password" 
@@ -55,6 +56,7 @@ const RegisterScreen = () => {
                 value={password} 
                 onChangeText={text => setPassword(text)} 
                 secureTextEntry
+                autoCapitalize="none"
             />
             <Input 
                 placeholder="Enter your Image Url" 
@@ -62,8 +64,9 @@ const RegisterScreen = () => {
                 leftIcon={{ type: 'material', name: 'face'}} 
                 value={imageUrl} 
                 onChangeText={text => setImageUrl(text)} 
+                autoCapitalize="none"
             />
-            <Button title="Register" style={styles.button} />
+            <Button title="Register" style={styles.button} onPress={register} />
         </View>
     )
 }
