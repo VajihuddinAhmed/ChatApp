@@ -18,9 +18,9 @@ const LoginScreen = ({ navigation }) => {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
-                navigation.replace('Chat')
+                navigation.replace('Chat');
             } else {
-            // User is signed out
+                navigation.canGoBack() && navigation.popToTop();
             }
           });
           return unsubscribe

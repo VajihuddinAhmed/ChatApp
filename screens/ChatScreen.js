@@ -1,11 +1,37 @@
-import React, { useLayoutEffect } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { auth } from "../firebase";
+import React, { useLayoutEffect, useState, useCallback } from "react";
+import { View, TouchableOpacity } from "react-native";
+import { auth, db } from "../firebase";
 import { AntDesign } from "@expo/vector-icons";
 import { Avatar } from "react-native-elements/dist/avatar/Avatar";
-
+import { GiftedChat } from 'react-native-gifted-chat';
 
 const ChatScreen = ({ navigation }) => {
+    const [messages, setMessages] = useState([]);
+ 
+    useLayoutEffect(() => {
+        const unsubscribe = db.collection('chats').orderBy('createdAt', 'desc').onSnapshot(snapshot => setMessages(
+            snapshot.docs.map(doc => ({
+                _id: doc.data()._id,
+                createdAt: doc.data().createdAt.toDate(),
+                text: doc.data().text,
+                user: doc.data().user
+            }))
+        )) 
+        return unsubscribe;
+
+    }, [])
+   
+    const onSend = useCallback((messages = []) => {
+      setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
+      const { _id, createdAt, text, user } = messages[0]
+      db.collection('chats').add({
+          _id,
+          createdAt,
+          text,
+          user,
+      })
+    }, [])
+
     useLayoutEffect(() => {
         navigation.setOptions({
             headerLeft: () => (
@@ -26,13 +52,21 @@ const ChatScreen = ({ navigation }) => {
             // Sign-out successful.
             navigation.replace('Login')
           }).catch((error) => {
+              console.log(error)
             // An error happened.
           });
     }
     return (
-        <View>
-            <Text>Chat screen</Text>
-        </View>
+        <GiftedChat
+            messages={messages}
+            showAvatarForEveryMessage={true}
+            onSend={messages => onSend(messages)}
+            user={{
+                _id: auth?.currentUser?.email,
+                name: auth?.currentUser?.displayName,
+                avatar: auth?.currentUser?.photoURL,
+            }}
+        />
     )
 }
 
